@@ -82,6 +82,59 @@
             margin: 5px 0;
         }
         
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .slider-container label {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .slider {
+            flex-grow: 1;
+            height: 10px;
+            -webkit-appearance: none;
+            background: #ddd;
+            outline: none;
+            border-radius: 5px;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            min-width: 40px;
+            text-align: center;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        
+        #p-slider::-webkit-slider-thumb {
+            background: blue;
+        }
+        
+        #q-slider::-webkit-slider-thumb {
+            background: red;
+        }
+        
         button {
             background-color: #4CAF50;
             color: white;
@@ -118,6 +171,19 @@
             background-color: #f5f5f5;
             min-width: 150px;
         }
+        
+        .sliders-section {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .sliders-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
@@ -148,16 +214,29 @@
             </div>
         </div>
         
-        <div class="controls">
-            <div>
-                <label>Player 1 (Row) Mixed Strategy (p):</label>
-                <input type="number" id="p-value" placeholder="Probability" value="0.5" min="0" max="1" step="0.1">
+        <div class="sliders-section">
+            <h2>Mixed Strategy Probabilities</h2>
+            <div class="sliders-container">
+                <div class="slider-container">
+                    <label>Player 1 (Row) Strategy 1 Probability (p)</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="p-slider" class="slider" min="0" max="1" step="0.01" value="0.5">
+                        <span id="p-value" class="slider-value">0.50</span>
+                    </div>
+                </div>
+                
+                <div class="slider-container">
+                    <label>Player 2 (Column) Strategy 1 Probability (q)</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="q-slider" class="slider" min="0" max="1" step="0.01" value="0.5">
+                        <span id="q-value" class="slider-value">0.50</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label>Player 2 (Column) Mixed Strategy (q):</label>
-                <input type="number" id="q-value" placeholder="Probability" value="0.5" min="0" max="1" step="0.1">
+            
+            <div style="text-align: center;">
+                <button id="update-button">Update Matrix</button>
             </div>
-            <button id="update-button">Update Matrix</button>
         </div>
         
         <table class="game-matrix">
@@ -187,7 +266,7 @@
                 </td>
                 <td id="row1-mixed">
                     <div class="payoff">
-                        <span class="row-player">1.5</span>
+                        <span class="row-player">1.5</span>, <span class="col-player">4.0</span>
                     </div>
                 </td>
             </tr>
@@ -205,7 +284,7 @@
                 </td>
                 <td id="row2-mixed">
                     <div class="payoff">
-                        <span class="row-player">3</span>
+                        <span class="row-player">3.0</span>, <span class="col-player">0.5</span>
                     </div>
                 </td>
             </tr>
@@ -213,12 +292,12 @@
                 <td class="header">Mixed Strategy</td>
                 <td id="col1-mixed">
                     <div class="payoff">
-                        <span class="col-player">1.5</span>
+                        <span class="row-player">4.0</span>, <span class="col-player">1.5</span>
                     </div>
                 </td>
                 <td id="col2-mixed">
                     <div class="payoff">
-                        <span class="col-player">3</span>
+                        <span class="row-player">0.5</span>, <span class="col-player">3.0</span>
                     </div>
                 </td>
                 <td id="mixed-mixed">
@@ -249,8 +328,27 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const pSlider = document.getElementById('p-slider');
+            const qSlider = document.getElementById('q-slider');
+            const pValue = document.getElementById('p-value');
+            const qValue = document.getElementById('q-value');
             const updateButton = document.getElementById('update-button');
+            
+            // Update value displays when sliders change
+            pSlider.addEventListener('input', function() {
+                pValue.textContent = parseFloat(this.value).toFixed(2);
+            });
+            
+            qSlider.addEventListener('input', function() {
+                qValue.textContent = parseFloat(this.value).toFixed(2);
+            });
+            
+            // Add update event
             updateButton.addEventListener('click', updateMatrix);
+            
+            // Live updates (optional - can be commented out if you prefer only button updates)
+            pSlider.addEventListener('input', updateMatrix);
+            qSlider.addEventListener('input', updateMatrix);
             
             // Initial update
             updateMatrix();
@@ -274,9 +372,9 @@
                     col: parseFloat(document.getElementById('a22-col').value)
                 };
                 
-                // Get mixed strategy probabilities
-                const p = parseFloat(document.getElementById('p-value').value);
-                const q = parseFloat(document.getElementById('q-value').value);
+                // Get mixed strategy probabilities from sliders
+                const p = parseFloat(pSlider.value);
+                const q = parseFloat(qSlider.value);
                 
                 // Update cell values
                 document.getElementById('cell-1-1').innerHTML = `
@@ -313,39 +411,55 @@
                 const colStrat1Payoff = p * a11.col + (1-p) * a21.col;
                 const colStrat2Payoff = p * a12.col + (1-p) * a22.col;
                 
+                // Calculate mixed payoffs for row strategies
+                const row1ColPayoff = q * a11.col + (1-q) * a12.col;
+                const row2ColPayoff = q * a21.col + (1-q) * a22.col;
+                
+                // Calculate mixed payoffs for column strategies
+                const col1RowPayoff = p * a11.row + (1-p) * a21.row;
+                const col2RowPayoff = p * a12.row + (1-p) * a22.row;
+                
                 // Calculate overall mixed strategy payoff
                 const rowMixedPayoff = p * rowStrat1Payoff + (1-p) * rowStrat2Payoff;
                 const colMixedPayoff = q * colStrat1Payoff + (1-q) * colStrat2Payoff;
                 
+                // Determine if mixed strategy is optimal
+                const isMixedRowBestResponse = isMixedStrategyOptimalForRow(p, q, a11, a12, a21, a22, rowMixedPayoff);
+                const isMixedColBestResponse = isMixedStrategyOptimalForCol(p, q, a11, a12, a21, a22, colMixedPayoff);
+                
                 // Update mixed strategy cells
                 document.getElementById('row1-mixed').innerHTML = `
                     <div class="payoff">
-                        <span class="row-player ${rowStrat1Payoff >= rowStrat2Payoff ? 'best-response' : ''}">${rowStrat1Payoff.toFixed(2)}</span>
+                        <span class="row-player ${rowStrat1Payoff >= rowStrat2Payoff ? 'best-response' : ''}">${rowStrat1Payoff.toFixed(2)}</span>, 
+                        <span class="col-player">${row1ColPayoff.toFixed(2)}</span>
                     </div>
                 `;
                 
                 document.getElementById('row2-mixed').innerHTML = `
                     <div class="payoff">
-                        <span class="row-player ${rowStrat2Payoff >= rowStrat1Payoff ? 'best-response' : ''}">${rowStrat2Payoff.toFixed(2)}</span>
+                        <span class="row-player ${rowStrat2Payoff >= rowStrat1Payoff ? 'best-response' : ''}">${rowStrat2Payoff.toFixed(2)}</span>, 
+                        <span class="col-player">${row2ColPayoff.toFixed(2)}</span>
                     </div>
                 `;
                 
                 document.getElementById('col1-mixed').innerHTML = `
                     <div class="payoff">
+                        <span class="row-player">${col1RowPayoff.toFixed(2)}</span>, 
                         <span class="col-player ${colStrat1Payoff >= colStrat2Payoff ? 'best-response' : ''}">${colStrat1Payoff.toFixed(2)}</span>
                     </div>
                 `;
                 
                 document.getElementById('col2-mixed').innerHTML = `
                     <div class="payoff">
+                        <span class="row-player">${col2RowPayoff.toFixed(2)}</span>, 
                         <span class="col-player ${colStrat2Payoff >= colStrat1Payoff ? 'best-response' : ''}">${colStrat2Payoff.toFixed(2)}</span>
                     </div>
                 `;
                 
                 document.getElementById('mixed-mixed').innerHTML = `
                     <div class="payoff">
-                        <span class="row-player">${rowMixedPayoff.toFixed(2)}</span>, 
-                        <span class="col-player">${colMixedPayoff.toFixed(2)}</span>
+                        <span class="row-player ${isMixedRowBestResponse ? 'best-response' : ''}">${rowMixedPayoff.toFixed(2)}</span>, 
+                        <span class="col-player ${isMixedColBestResponse ? 'best-response' : ''}">${colMixedPayoff.toFixed(2)}</span>
                     </div>
                 `;
                 
@@ -379,6 +493,24 @@
                     if (col === 1) return a21.col >= a22.col;
                     else return a22.col > a21.col;
                 }
+            }
+            
+            function isMixedStrategyOptimalForRow(p, q, a11, a12, a21, a22, mixedPayoff) {
+                // Calculate payoffs for pure strategies under current mixed strategy of opponent
+                const pureStrat1Payoff = q * a11.row + (1-q) * a12.row;
+                const pureStrat2Payoff = q * a21.row + (1-q) * a22.row;
+                
+                // Check if the mixed strategy gives at least as good a payoff as any pure strategy
+                return mixedPayoff >= Math.max(pureStrat1Payoff, pureStrat2Payoff) - 0.01; // Adding small epsilon for floating point comparison
+            }
+            
+            function isMixedStrategyOptimalForCol(p, q, a11, a12, a21, a22, mixedPayoff) {
+                // Calculate payoffs for pure strategies under current mixed strategy of opponent
+                const pureStrat1Payoff = p * a11.col + (1-p) * a21.col;
+                const pureStrat2Payoff = p * a12.col + (1-p) * a22.col;
+                
+                // Check if the mixed strategy gives at least as good a payoff as any pure strategy
+                return mixedPayoff >= Math.max(pureStrat1Payoff, pureStrat2Payoff) - 0.01; // Adding small epsilon for floating point comparison
             }
             
             function analyzeNashEquilibria(a11, a12, a21, a22) {

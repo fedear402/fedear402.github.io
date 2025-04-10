@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Game Theory Matrix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        .game-container {
+            margin: 30px 0;
+        }
+        
+        .game-matrix {
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+        
+        .game-matrix td {
+            border: 1px solid #ccc;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            min-width: 120px;
+        }
+        
+        .game-matrix .header {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        
+        .game-matrix .empty {
+            border: none;
+            background-color: white;
+        }
+        
+        .payoff {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .row-player {
+            color: blue;
+        }
+        
+        .col-player {
+            color: red;
+        }
+        
+        .best-response {
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .controls > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            margin: 5px 0;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .mixed-strategy {
+            margin-top: 30px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .outcome-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        
+        .outcome {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            min-width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interactive 2×2 Game Theory Matrix</h1>
+    
+    <div class="game-container">
+        <h2>Matrix Setup</h2>
+        <div class="controls">
+            <div>
+                <label>Cell (1,1):</label>
+                <input type="number" id="a11-row" placeholder="Row" value="3">
+                <input type="number" id="a11-col" placeholder="Column" value="3">
+            </div>
+            <div>
+                <label>Cell (1,2):</label>
+                <input type="number" id="a12-row" placeholder="Row" value="0">
+                <input type="number" id="a12-col" placeholder="Column" value="5">
+            </div>
+            <div>
+                <label>Cell (2,1):</label>
+                <input type="number" id="a21-row" placeholder="Row" value="5">
+                <input type="number" id="a21-col" placeholder="Column" value="0">
+            </div>
+            <div>
+                <label>Cell (2,2):</label>
+                <input type="number" id="a22-row" placeholder="Row" value="1">
+                <input type="number" id="a22-col" placeholder="Column" value="1">
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div>
+                <label>Player 1 (Row) Mixed Strategy (p):</label>
+                <input type="number" id="p-value" placeholder="Probability" value="0.5" min="0" max="1" step="0.1">
+            </div>
+            <div>
+                <label>Player 2 (Column) Mixed Strategy (q):</label>
+                <input type="number" id="q-value" placeholder="Probability" value="0.5" min="0" max="1" step="0.1">
+            </div>
+            <button id="update-button">Update Matrix</button>
+        </div>
+        
+        <table class="game-matrix">
+            <tr>
+                <td class="empty"></td>
+                <td class="header">Column Player (q)</td>
+                <td class="header"></td>
+                <td class="header">Mixed Strategy</td>
+            </tr>
+            <tr>
+                <td class="empty"></td>
+                <td class="header">Strategy 1 (q)</td>
+                <td class="header">Strategy 2 (1-q)</td>
+                <td class="header">Expected Payoff</td>
+            </tr>
+            <tr>
+                <td class="header">Row Player (p)<br>Strategy 1 (p)</td>
+                <td id="cell-1-1">
+                    <div class="payoff">
+                        <span class="row-player">3</span>, <span class="col-player">3</span>
+                    </div>
+                </td>
+                <td id="cell-1-2">
+                    <div class="payoff">
+                        <span class="row-player">0</span>, <span class="col-player">5</span>
+                    </div>
+                </td>
+                <td id="row1-mixed">
+                    <div class="payoff">
+                        <span class="row-player">1.5</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="header">Strategy 2 (1-p)</td>
+                <td id="cell-2-1">
+                    <div class="payoff">
+                        <span class="row-player">5</span>, <span class="col-player">0</span>
+                    </div>
+                </td>
+                <td id="cell-2-2">
+                    <div class="payoff">
+                        <span class="row-player">1</span>, <span class="col-player">1</span>
+                    </div>
+                </td>
+                <td id="row2-mixed">
+                    <div class="payoff">
+                        <span class="row-player">3</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="header">Mixed Strategy</td>
+                <td id="col1-mixed">
+                    <div class="payoff">
+                        <span class="col-player">1.5</span>
+                    </div>
+                </td>
+                <td id="col2-mixed">
+                    <div class="payoff">
+                        <span class="col-player">3</span>
+                    </div>
+                </td>
+                <td id="mixed-mixed">
+                    <div class="payoff">
+                        <span class="row-player">2.25</span>, <span class="col-player">2.25</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        
+        <div class="mixed-strategy">
+            <h3>Nash Equilibrium Analysis</h3>
+            <div id="nash-equilibrium">Calculating Nash equilibria...</div>
+            
+            <h3>Current Mixed Strategy Expected Payoffs</h3>
+            <div class="outcome-container">
+                <div class="outcome">
+                    <h4>Row Player</h4>
+                    <div id="row-expected">2.25</div>
+                </div>
+                <div class="outcome">
+                    <h4>Column Player</h4>
+                    <div id="col-expected">2.25</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const updateButton = document.getElementById('update-button');
+            updateButton.addEventListener('click', updateMatrix);
+            
+            // Initial update
+            updateMatrix();
+            
+            function updateMatrix() {
+                // Get matrix values
+                const a11 = {
+                    row: parseFloat(document.getElementById('a11-row').value),
+                    col: parseFloat(document.getElementById('a11-col').value)
+                };
+                const a12 = {
+                    row: parseFloat(document.getElementById('a12-row').value),
+                    col: parseFloat(document.getElementById('a12-col').value)
+                };
+                const a21 = {
+                    row: parseFloat(document.getElementById('a21-row').value),
+                    col: parseFloat(document.getElementById('a21-col').value)
+                };
+                const a22 = {
+                    row: parseFloat(document.getElementById('a22-row').value),
+                    col: parseFloat(document.getElementById('a22-col').value)
+                };
+                
+                // Get mixed strategy probabilities
+                const p = parseFloat(document.getElementById('p-value').value);
+                const q = parseFloat(document.getElementById('q-value').value);
+                
+                // Update cell values
+                document.getElementById('cell-1-1').innerHTML = `
+                    <div class="payoff">
+                        <span class="row-player ${isRowBestResponse(1, 1, a11, a12, a21, a22) ? 'best-response' : ''}">${a11.row}</span>, 
+                        <span class="col-player ${isColBestResponse(1, 1, a11, a12, a21, a22) ? 'best-response' : ''}">${a11.col}</span>
+                    </div>
+                `;
+                
+                document.getElementById('cell-1-2').innerHTML = `
+                    <div class="payoff">
+                        <span class="row-player ${isRowBestResponse(1, 2, a11, a12, a21, a22) ? 'best-response' : ''}">${a12.row}</span>, 
+                        <span class="col-player ${isColBestResponse(1, 2, a11, a12, a21, a22) ? 'best-response' : ''}">${a12.col}</span>
+                    </div>
+                `;
+                
+                document.getElementById('cell-2-1').innerHTML = `
+                    <div class="payoff">
+                        <span class="row-player ${isRowBestResponse(2, 1, a11, a12, a21, a22) ? 'best-response' : ''}">${a21.row}</span>, 
+                        <span class="col-player ${isColBestResponse(2, 1, a11, a12, a21, a22) ? 'best-response' : ''}">${a21.col}</span>
+                    </div>
+                `;
+                
+                document.getElementById('cell-2-2').innerHTML = `
+                    <div class="payoff">
+                        <span class="row-player ${isRowBestResponse(2, 2, a11, a12, a21, a22) ? 'best-response' : ''}">${a22.row}</span>, 
+                        <span class="col-player ${isColBestResponse(2, 2, a11, a12, a21, a22) ? 'best-response' : ''}">${a22.col}</span>
+                    </div>
+                `;
+                
+                // Calculate expected payoffs for mixed strategies
+                const rowStrat1Payoff = q * a11.row + (1-q) * a12.row;
+                const rowStrat2Payoff = q * a21.row + (1-q) * a22.row;
+                const colStrat1Payoff = p * a11.col + (1-p) * a21.col;
+                const colStrat2Payoff = p * a12.col + (1-p) * a22.col;
+                
+                // Calculate overall mixed strategy payoff
+                const rowMixedPayoff = p * rowStrat1Payoff + (1-p) * rowStrat2Payoff;
+                const colMixedPayoff = q * colStrat1Payoff + (1-q) * colStrat2Payoff;
+                
+                // Update mixed strategy cells
+                document.getElementById('row1-mixed').innerHTML = `
+                    <div class="payoff">
+                        <span class="row-player ${rowStrat1Payoff >= rowStrat2Payoff ? 'best-response' : ''}">${rowStrat1Payoff.toFixed(2)}</span>
+                    </div>
+                `;
+                
+                document.getElementById('row2-mixed').innerHTML = `
+                    <div class="payoff">
+                        <span class="row-player ${rowStrat2Payoff >= rowStrat1Payoff ? 'best-response' : ''}">${rowStrat2Payoff.toFixed(2)}</span>
+                    </div>
+                `;
+                
+                document.getElementById('col1-mixed').innerHTML = `
+                    <div class="payoff">
+                        <span class="col-player ${colStrat1Payoff >= colStrat2Payoff ? 'best-response' : ''}">${colStrat1Payoff.toFixed(2)}</span>
+                    </div>
+                `;
+                
+                document.getElementById('col2-mixed').innerHTML = `
+                    <div class="payoff">
+                        <span class="col-player ${colStrat2Payoff >= colStrat1Payoff ? 'best-response' : ''}">${colStrat2Payoff.toFixed(2)}</span>
+                    </div>
+                `;
+                
+                document.getElementById('mixed-mixed').innerHTML = `
+                    <div class="payoff">
+                        <span class="row-player">${rowMixedPayoff.toFixed(2)}</span>, 
+                        <span class="col-player">${colMixedPayoff.toFixed(2)}</span>
+                    </div>
+                `;
+                
+                // Update expected payoff display
+                document.getElementById('row-expected').textContent = rowMixedPayoff.toFixed(2);
+                document.getElementById('col-expected').textContent = colMixedPayoff.toFixed(2);
+                
+                // Analyze Nash equilibria
+                analyzeNashEquilibria(a11, a12, a21, a22);
+            }
+            
+            function isRowBestResponse(row, col, a11, a12, a21, a22) {
+                if (col === 1) {
+                    // Column player chose strategy 1
+                    if (row === 1) return a11.row >= a21.row;
+                    else return a21.row > a11.row;
+                } else {
+                    // Column player chose strategy 2
+                    if (row === 1) return a12.row >= a22.row;
+                    else return a22.row > a12.row;
+                }
+            }
+            
+            function isColBestResponse(row, col, a11, a12, a21, a22) {
+                if (row === 1) {
+                    // Row player chose strategy 1
+                    if (col === 1) return a11.col >= a12.col;
+                    else return a12.col > a11.col;
+                } else {
+                    // Row player chose strategy 2
+                    if (col === 1) return a21.col >= a22.col;
+                    else return a22.col > a21.col;
+                }
+            }
+            
+            function analyzeNashEquilibria(a11, a12, a21, a22) {
+                const nashElement = document.getElementById('nash-equilibrium');
+                let nashText = '';
+                
+                // Check pure strategy Nash equilibria
+                const isNash11 = isRowBestResponse(1, 1, a11, a12, a21, a22) && isColBestResponse(1, 1, a11, a12, a21, a22);
+                const isNash12 = isRowBestResponse(1, 2, a11, a12, a21, a22) && isColBestResponse(1, 2, a11, a12, a21, a22);
+                const isNash21 = isRowBestResponse(2, 1, a11, a12, a21, a22) && isColBestResponse(2, 1, a11, a12, a21, a22);
+                const isNash22 = isRowBestResponse(2, 2, a11, a12, a21, a22) && isColBestResponse(2, 2, a11, a12, a21, a22);
+                
+                let hasPureNash = false;
+                nashText += "<strong>Pure Strategy Nash Equilibria:</strong><br>";
+                
+                if (isNash11) {
+                    nashText += "- (Row 1, Column 1) is a Nash equilibrium<br>";
+                    hasPureNash = true;
+                }
+                if (isNash12) {
+                    nashText += "- (Row 1, Column 2) is a Nash equilibrium<br>";
+                    hasPureNash = true;
+                }
+                if (isNash21) {
+                    nashText += "- (Row 2, Column 1) is a Nash equilibrium<br>";
+                    hasPureNash = true;
+                }
+                if (isNash22) {
+                    nashText += "- (Row 2, Column 2) is a Nash equilibrium<br>";
+                    hasPureNash = true;
+                }
+                
+                if (!hasPureNash) {
+                    nashText += "- No pure strategy Nash equilibria found<br>";
+                    
+                    // Try to calculate mixed strategy equilibrium
+                    try {
+                        const rowMixProb = findRowMixedStrategyEquilibrium(a11, a12, a21, a22);
+                        const colMixProb = findColMixedStrategyEquilibrium(a11, a12, a21, a22);
+                        
+                        nashText += "<br><strong>Mixed Strategy Nash Equilibrium:</strong><br>";
+                        nashText += `- Row player: play Strategy 1 with probability ${rowMixProb.toFixed(2)} and Strategy 2 with probability ${(1-rowMixProb).toFixed(2)}<br>`;
+                        nashText += `- Column player: play Strategy 1 with probability ${colMixProb.toFixed(2)} and Strategy 2 with probability ${(1-colMixProb).toFixed(2)}<br>`;
+                    } catch (e) {
+                        nashText += "<br>Could not calculate mixed strategy equilibrium for this game.";
+                    }
+                }
+                
+                nashElement.innerHTML = nashText;
+            }
+            
+            function findRowMixedStrategyEquilibrium(a11, a12, a21, a22) {
+                // To make column player indifferent, solve:
+                // p*a11.col + (1-p)*a21.col = p*a12.col + (1-p)*a22.col
+                
+                const leftSide = a11.col - a21.col;
+                const rightSide = a12.col - a22.col;
+                const diff = leftSide - rightSide;
+                
+                if (Math.abs(diff) < 0.0001) {
+                    throw new Error("No unique mixed strategy equilibrium");
+                }
+                
+                const pStar = (a22.col - a21.col) / diff;
+                
+                // Ensure p is between 0 and 1
+                if (pStar < 0 || pStar > 1) {
+                    throw new Error("Mixed strategy equilibrium out of bounds");
+                }
+                
+                return pStar;
+            }
+            
+            function findColMixedStrategyEquilibrium(a11, a12, a21, a22) {
+                // To make row player indifferent, solve:
+                // q*a11.row + (1-q)*a12.row = q*a21.row + (1-q)*a22.row
+                
+                const leftSide = a11.row - a12.row;
+                const rightSide = a21.row - a22.row;
+                const diff = leftSide - rightSide;
+                
+                if (Math.abs(diff) < 0.0001) {
+                    throw new Error("No unique mixed strategy equilibrium");
+                }
+                
+                const qStar = (a22.row - a12.row) / diff;
+                
+                // Ensure q is between 0 and 1
+                if (qStar < 0 || qStar > 1) {
+                    throw new Error("Mixed strategy equilibrium out of bounds");
+                }
+                
+                return qStar;
+            }
+        });
+    </script>
+</body>
+</html>

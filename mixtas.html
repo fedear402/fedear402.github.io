@@ -233,24 +233,24 @@
                 <div class="slider-container">
                     <label>Jugador 1 (Fila) Probabilidad de Estrategia 1 (p)</label>
                     <div class="slider-wrapper">
-                        <input type="range" id="p-slider" class="slider" min="0" max="1" step="0.01" value="0.5">
+                        <input type="range" id="p-slider" class="slider" min="0" max="1" step="0.001" value="0.5">
                         <span id="p-value" class="slider-value">0.50</span>
                     </div>
                     <div class="p-input-wrapper">
                         <label for="p-input">Valor p:</label>
-                        <input type="number" id="p-input" min="0" max="1" step="0.01" value="0.5">
+                        <input type="number" id="p-input" min="0" max="1" step="0.001" value="0.5">
                     </div>
                 </div>
                 
                 <div class="slider-container">
                     <label>Jugador 2 (Columna) Probabilidad de Estrategia 1 (q)</label>
                     <div class="slider-wrapper">
-                        <input type="range" id="q-slider" class="slider" min="0" max="1" step="0.01" value="0.5">
+                        <input type="range" id="q-slider" class="slider" min="0" max="1" step="0.001" value="0.5">
                         <span id="q-value" class="slider-value">0.50</span>
                     </div>
                     <div class="q-input-wrapper">
                         <label for="q-input">Valor q:</label>
-                        <input type="number" id="q-input" min="0" max="1" step="0.01" value="0.5">
+                        <input type="number" id="q-input" min="0" max="1" step="0.001" value="0.5">
                     </div>
                 </div>
             </div>
@@ -622,7 +622,7 @@
                 const rightSide = a12.col - a22.col;
                 const diff = leftSide - rightSide;
                 
-                if (Math.abs(diff) < 0.0001) {
+                if (Math.abs(diff) < 0.000001) {
                     throw new Error("No hay equilibrio de estrategia mixta único");
                 }
                 
@@ -644,7 +644,7 @@
                 const rightSide = a21.row - a22.row;
                 const diff = leftSide - rightSide;
                 
-                if (Math.abs(diff) < 0.0001) {
+                if (Math.abs(diff) < 0.000001) {
                     throw new Error("No hay equilibrio de estrategia mixta único");
                 }
                 

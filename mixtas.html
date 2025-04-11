@@ -622,7 +622,7 @@
                 const rightSide = a12.col - a22.col;
                 const diff = leftSide - rightSide;
                 
-                if (Math.abs(diff) < 0.000001) {
+                if (Math.abs(diff) < 0.001) {
                     throw new Error("No hay equilibrio de estrategia mixta único");
                 }
                 
@@ -644,7 +644,7 @@
                 const rightSide = a21.row - a22.row;
                 const diff = leftSide - rightSide;
                 
-                if (Math.abs(diff) < 0.000001) {
+                if (Math.abs(diff) < 0.001) {
                     throw new Error("No hay equilibrio de estrategia mixta único");
                 }
                 
